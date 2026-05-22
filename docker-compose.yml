@@ -44,7 +44,7 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://localhost:3000/api
+        VITE_API_URL: http://localhost:3000
     restart: unless-stopped
     depends_on:
       - my-app

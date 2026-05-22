@@ -2,13 +2,22 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
 
 const normalizeBaseUrl = () => {
   if (!API_BASE_URL) {
-    throw new Error('Thiếu VITE_API_URL trong file .env.')
+    // No build-time API host provided -> use same-origin requests via `/api`
+    return ''
   }
 
   return API_BASE_URL.replace(/\/$/, '')
 }
 
-const buildUrl = (path) => `${normalizeBaseUrl()}${path}`
+// Build final API URL. If no external host is provided, call the relative
+// `/api` path so the browser uses the same origin and the frontend's proxy
+// (nginx) can forward requests to the backend service.
+const buildUrl = (path) => {
+  const base = normalizeBaseUrl()
+  if (!base) return `/api${path}`
+  if (base.endsWith('/api')) return `${base}${path}`
+  return `${base}/api${path}`
+}
 
 const toFriendlyNetworkError = (error) => {
   if (error instanceof TypeError) {
